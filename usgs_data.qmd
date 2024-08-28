@@ -1,0 +1,60 @@
+---
+title: "API practice"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(dataRetrieval)
+library(tidyverse)
+```
+
+
+```{r}
+# set parameters for query
+siteNumber <- "11118500"
+parameterCd <- c("00010","00060")
+startDate <- "2023-08-19"
+endDate <- "2023-08-22"
+statCd <- c("00001", "00003")
+
+# dv gives daily values
+discharge <- readNWISdv(siteNumber, parameterCd, startDate, endDate) %>% 
+  rename(discharge = X_00060_00003)
+
+# uv gives instantaneous values
+discharge <- readNWISuv(siteNumber, parameterCd, startDate, endDate) 
+```
+
+```{r}
+ggplot(data = discharge, aes(x = Date, y = X_00060_00003)) +
+  geom_line() + 
+  labs(y = "Discharge rate (ft^3/s)", title = "Discharge Rate of Ventura River during Hilary Tropical Storm") +
+  theme_bw()
+```
+
+```{r}
+startDatenew <- "2023-01-09"
+endDatenew <- "2023-01-09"
+
+dischargenew <- readNWISdv(siteNumber, parameterCd, startDatenew, endDatenew)
+
+temperatureAndFlow <- readNWISdv(siteNumber, parameterCd,
+  startDate, endDate,
+  statCd = statCd
+)
+
+names(temperatureAndFlow)
+temperatureAndFlow <- renameNWISColumns(temperatureAndFlow)
+names(temperatureAndFlow)
+```
+
+```{r}
+ggplot(data = dischargenew, aes(x = Date, y = X_00060_00003)) +
+  geom_point() + 
+  labs(y = "Discharge rate (ft^3/s)", title = "Discharge Rate of Ventura River on 2023-01-09") +
+  theme_bw()
+```
+
